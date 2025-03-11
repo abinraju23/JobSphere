@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block title %}Jobs{% endblock %}
+
+{% block content %}
+
+<style>
+    /* Enhanced styling for thumbnails */
+    .thumb {
+        width: 80px; /* Fixed size for consistency */
+        height: 80px; /* Fixed size for consistency */
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f0f0f0;
+        border-radius: 8px;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .thumb:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .logo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    /* Job card styling */
+    .single_jobs {
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        margin-bottom: 15px; /* Reduced margin */
+        box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        border-left: 4px solid transparent;
+        padding: 15px; /* Reduced padding */
+    }
+    
+    .single_jobs:hover {
+        border-left: 4px solid #00D363;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+    
+    /* Apply Now button enhancement */
+    .boxed-btn3 {
+        transition: all 0.3s ease;
+        padding: 8px 20px; /* Adjusted padding */
+        font-size: 14px; /* Smaller font size */
+    }
+    
+    .boxed-btn3:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    /* Heart animation */
+    .heart_mark {
+        transition: all 0.3s ease;
+        margin-right: 10px; /* Reduced margin */
+    }
+    
+    .heart_mark.red i {
+        color: #ff5e5e;
+        transform: scale(1.2);
+    }
+    
+    /* Inspirational quotes section */
+    .quote_section {
+        background: linear-gradient(to right, #f9f9ff, #ffffff);
+        padding: 20px 0; /* Reduced padding */
+        margin-bottom: 20px; /* Reduced margin */
+        border-radius: 8px;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.05);
+    }
+    
+    .quote_box {
+        text-align: center;
+        padding: 15px; /* Reduced padding */
+    }
+    
+    .quote_text {
+        font-style: italic;
+        font-size: 18px; /* Smaller font size */
+        line-height: 1.5; /* Adjusted line height */
+        color: #444;
+        margin-bottom: 10px; /* Reduced margin */
+        position: relative;
+        padding: 0 30px; /* Reduced padding */
+    }
+    
+    .quote_text:before, .quote_text:after {
+        content: '"';
+        font-size: 40px; /* Smaller font size */
+        color: #00D363;
+        opacity: 0.3;
+        position: absolute;
+    }
+    
+    .quote_text:before {
+        left: 0;
+        top: -15px; /* Adjusted position */
+    }
+    
+    .quote_text:after {
+        right: 0;
+        bottom: -30px; /* Adjusted position */
+    }
+    
+    .quote_author {
+        font-weight: 600;
+        color: #333;
+        font-size: 14px; /* Smaller font size */
+    }
+    
+    /* Enhanced pagination */
+    .pagination_wrap ul li a {
+        transition: all 0.3s ease;
+        padding: 8px 12px; /* Reduced padding */
+        font-size: 14px; /* Smaller font size */
+    }
+    
+    .pagination_wrap ul li a:hover {
+        background-color: #00D363;
+        color: white;
+    }
+    
+    /* Reduced spacing for job listings */
+    .job_listing_area {
+        padding-top: 20px; /* Reduced padding */
+        padding-bottom: 20px; /* Reduced padding */
+    }
+    
+    /* Adjusted bradcam_area spacing */
+    .bradcam_area {
+        padding: 60px 0; /* Reduced padding */
+    }
+    
+    .bradcam_text h3 {
+        font-size: 28px; /* Smaller font size */
+        margin-bottom: 10px; /* Reduced margin */
+    }
+</style>
+
+    <!-- bradcam_area with enhanced text shadow -->
+    <div class="bradcam_area bradcam_bg_1">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="bradcam_text" style="text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                        <h3>Discover Exciting Job Opportunities!</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--/ bradcam_area  -->
+
+    <!-- Inspirational Quote Section -->
+    <div class="quote_section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="quote_box">
+                        <p class="quote_text" id="inspirational_quote">The only way to do great work is to love what you do. If you haven't found it yet, keep looking. Don't settle.</p>
+                        <p class="quote_author" id="quote_author">- Steve Jobs</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--/ Inspirational Quote Section -->
+
+   <!-- job_listing_area_start -->
+<div class="job_listing_area plus_padding">
+    <div class="container">
+        <div class="job_lists m-0">
+            <div class="row">
+            {% for job in jobs %}
+                <div class="col-lg-12 col-md-12">
+                    <div class="single_jobs white-bg d-flex justify-content-between">
+                        <div class="jobs_left d-flex align-items-center">
+                            <div class="thumb">
+                                <img src="{{ job.employer.logo.url }}" alt="{{ job.title }}" class="logo">
+                            </div>
+                            <div class="jobs_conetent">
+                                <a href="{% url 'job_details' job_id=job.job_id %}">{{ job.title }}</a>
+                                <div class="links_locat d-flex align-items-center">
+                                    <div class="location">
+                                        <p> <i class="fa fa-map-marker"></i> {{ job.location }}</p>
+                                    </div>
+                                    <div class="location">
+                                        <p> <i class="fa fa-clock-o"></i> {{ job.get_job_type_display }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="jobs_right">
+                            <div class="apply_now">
+                                <a class="heart_mark" href="javascript:void(0);"> <i class="fa fa-heart"></i> </a>
+                                <a href="{% url 'job_details' job_id=job.job_id %}" class="boxed-btn3">Apply Now</a>
+                            </div>
+                            <div class="date">
+                                <p>Date line: {{ job.published_on }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="pagination_wrap">
+                            <ul>
+                                <li><a href="#"> <i class="ti-angle-left"></i> </a></li>
+                                <li><a href="#"><span>01</span></a></li>
+                                <li><a href="#"><span>02</span></a></li>
+                                <li><a href="#"> <i class="ti-angle-right"></i> </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- job_listing_area_end -->
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(document).ready(function() {
+            // Heart animation with better toggle
+            $('.heart_mark').click(function(e) {
+                e.preventDefault();
+                $(this).toggleClass('red');
+                
+                if($(this).hasClass('red')) {
+                    $(this).find('i').removeClass('fa-heart-o').addClass('fa-heart');
+                } else {
+                    $(this).find('i').removeClass('fa-heart').addClass('fa-heart-o');
+                }
+            });
+            
+            // Inspirational quotes rotation
+            const quotes = [
+                {text: "The only way to do great work is to love what you do. If you haven't found it yet, keep looking. Don't settle.", author: "- Steve Jobs"},
+                {text: "Choose a job you love, and you will never have to work a day in your life.", author: "- Confucius"},
+                {text: "Your work is going to fill a large part of your life, and the only way to be truly satisfied is to do what you believe is great work.", author: "- Steve Jobs"},
+                {text: "The future depends on what you do today.", author: "- Mahatma Gandhi"},
+                {text: "Opportunities don't happen. You create them.", author: "- Chris Grosser"},
+                {text: "Success is not the key to happiness. Happiness is the key to success. If you love what you are doing, you will be successful.", author: "- Albert Schweitzer"}
+            ];
+            
+            // Show random quote on page load
+            function setRandomQuote() {
+                const randomIndex = Math.floor(Math.random() * quotes.length);
+                $("#inspirational_quote").text(quotes[randomIndex].text);
+                $("#quote_author").text(quotes[randomIndex].author);
+            }
+            
+            setRandomQuote();
+            
+            // Change quote every 10 seconds
+            setInterval(setRandomQuote, 10000);
+            
+            // Add subtle hover effects
+            $(".single_jobs").hover(function() {
+                $(this).find(".jobs_conetent a").css("color", "#00D363");
+            }, function() {
+                $(this).find(".jobs_conetent a").css("color", "");
+            });
+        });
+    </script>
+{% endblock %}

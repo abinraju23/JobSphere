@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% block title %}Jobs{% endblock %}
+{% block content %}
+<style>
+    .thumb {
+        width: 10vw; /* 10% of the viewport width */
+        height: 10vw; /* 10% of the viewport width */
+        max-width: 100px; /* Maximum size */
+        max-height: 100px; /* Maximum size */
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f0f0f0;
+    }
+    
+    .logo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .applicant-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .applicant-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        margin-bottom: 10px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s ease;
+    }
+
+    .applicant-item:hover {
+        background-color: #f1f1f1;
+    }
+
+    .applicant-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .applicant-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .applicant-status {
+        font-size: 14px;
+        color: #666;
+    }
+
+    /* Styling for the Update Status button */
+    .btn-update-status {
+        background-color: #007bff;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 14px;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .btn-update-status:hover {
+        background-color: #0056b3;
+        transform: translateY(-2px);
+    }
+
+    .btn-update-status:active {
+        transform: translateY(0);
+    }
+
+    /* Styling for the "No applicants yet" message */
+    .no-applicants {
+        font-size: 16px;
+        color: #666;
+        text-align: center;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<!-- bradcam_area  -->
+<div class="bradcam_area bradcam_bg_1">
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="bradcam_text">
+                    <h3>{{ job.title }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ bradcam_area  -->
+
+<div class="job_details_area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="job_details_header">
+                    <div class="single_jobs white-bg d-flex justify-content-between">
+                        <div class="jobs_left d-flex align-items-center">
+                            <div class="thumb">
+                                <img src="{{ job.employer.logo.url }}" alt="{{ job.title }}" class="logo">
+                            </div>
+                            <div class="jobs_conetent">
+                                <h4>{{ job.title }}</h4>
+                                <div class="links_locat d-flex align-items-center">
+                                    <div class="location">
+                                        <p> <i class="fa fa-map-marker"></i> {{ job.location }}</p>
+                                    </div>
+                                    <div class="location">
+                                        <p> <i class="fa fa-clock-o"></i> {{ job.get_job_type_display }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="descript_wrap white-bg">
+                    <div class="single_wrap">
+                        <h4>Job description</h4>
+                        <p>{{ job.description }}</p>
+                    </div>
+                    <div class="single_wrap">
+                        <h4>Responsibility</h4>
+                        <ul>
+                            {{ job.responsibilities|linebreaks }}
+                        </ul>
+                    </div>
+                    <div class="single_wrap">
+                        <h4>Qualifications</h4>
+                        <ul>
+                            {{ job.qualifications|linebreaks }}
+                        </ul>
+                    </div>
+                    <div class="single_wrap">
+                        <h4>Benefits</h4>
+                        <p>{{ job.benefits }}</p>
+                    </div>
+                </div>
+                <div class="apply_job_form white-bg">
+                    {% if user.is_authenticated %}
+                        {% if user.employee %}
+                            {% if not job_status %}
+                                <a href="{% url 'apply_for_job' job.job_id %}" class="btn btn-primary">Apply for Job</a>
+                            {% else %}
+                                <a href="#">Status: {{ job_status.status }}</a>
+                            {% endif %}
+                        {% elif user.employer %}
+                            <a href="{% url 'edit_job' job.job_id %}" class="btn btn-primary">Edit</a>
+                            <a href="{% url 'delete_job' job.job_id %}" class="btn btn-danger">Delete</a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'user_login' %}" class="btn btn-primary">Login to Apply</a>
+                    {% endif %}
+                </div>
+                {% if user.is_authenticated and user.employer %}
+                <div class="apply_job_form white-bg">
+                    <h3>Applicants:</h3>
+                    {% if job_statuses %}
+                        <ul class="applicant-list">
+                            {% for status in job_statuses %}
+                                <li class="applicant-item">
+                                    <div class="applicant-info">
+                                        <span class="applicant-name">{{ status.employee.wo_name }}</span>
+                                        <span class="applicant-status">{{ status.status }}</span>
+                                    </div>
+                                    <a href="{% url 'update_job_status' job.job_id status.employee.wo_id %}" class="btn-update-status">Update Status</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="no-applicants">No applicants yet.</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+            </div>
+            <div class="col-lg-4">
+                <div class="job_sumary">
+                    <div class="summery_header">
+                        <h3>Job Summary</h3>
+                    </div>
+                    <div class="job_content">
+                        <ul>
+                            <li>Published on: <span>{{ job.published_on }}</span></li>
+                            <li>Vacancy: <span>{{ job.vacancy }} Position</span></li>
+                            <li>Salary: <span>{{ job.salary }} per year</span></li>
+                            <li>Location: <span>{{ job.location }}</span></li>
+                            <li>Job Nature: <span>{{ job.get_job_type_display }}</span></li>
+                            <li>Experience:<span>{{ job.experience }}</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}{{ employee.wo_name }} - Employee Profile{% endblock %}
+
+{% block content %}
+<div class="bradcam_area bradcam_bg_1">
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="bradcam_text">
+                    <h3>Employee Profile</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="employee_details_area mt-5 mb-5">
+    <div class="container">
+        <div class="row">
+            <!-- Employee Profile Card -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body text-center p-4">
+                        <h3 class="card-title mb-2">{{ employee.wo_name }}</h3>
+                        <p class="card-text text-muted">
+                            <i class="fa fa-briefcase mr-2"></i>{{ employee.wo_position }}
+                        </p>
+                        <p class="card-text text-muted">
+                            <i class="fa fa-map-marker-alt mr-2"></i>{{ employee.wo_address }}
+                        </p>
+                        
+                        {% if request.user.employee.type == 'Employee' and request.user.employee.wo_id == employee.wo_id %}
+                        <div class="employee_actions mt-4">
+                            <a href="{% url 'edit_employee' employee.wo_id %}" class="btn btn-warning btn-block mb-2">
+                                <i class="fa fa-edit mr-2"></i>Edit Profile
+                            </a>
+                            <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#deleteEmployeeModal">
+                                <i class="fa fa-trash mr-2"></i>Delete Profile
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Contact Information Card -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-3">Contact Information</h5>
+                        <div class="contact_info">
+                            <div class="single_info mb-3">
+                                <span><i class="fa fa-envelope mr-2"></i> Email:</span>
+                                <p>{{ employee.wo_email }}</p>
+                            </div>
+                            <div class="single_info mb-3">
+                                <span><i class="fa fa-phone mr-2"></i> Phone:</span>
+                                <p>{{ employee.wo_phone }}</p>
+                            </div>
+                            <div class="single_info mb-3">
+                                <span><i class="fa fa-file mr-2"></i> Resume:</span>
+                                <p><a href="{{ employee.wo_resume.url }}" class="btn btn-sm btn-outline-primary">Download Resume</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Employee Details -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h4 class="card-title mb-4">About {{ employee.wo_name }}</h4>
+                        <div class="employee_details mb-4">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="single_detail mb-3">
+                                        <h6>Gender</h6>
+                                        <p>{{ employee.wo_gender }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="single_detail mb-3">
+                                        <h6>Date of Birth</h6>
+                                        <p>{{ employee.wo_dob }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {% if employee.wo_bio %}
+                            <div class="mt-4">
+                                <h6>Biography</h6>
+                                <p>{{ employee.wo_bio|linebreaks }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Applied Jobs Section -->
+                         
+                        {% if request.user.employee.type == 'Employee' and request.user.employee.wo_id == employee.wo_id %}
+                        <div class="jobs_applied mt-5">
+                            <div class="section_title">
+                                <h4>Applied Jobs</h4>
+                            </div>
+                            
+                            {% if employee.wo_applied_jobs.all %}
+                                <div class="job_listings">
+                                    {% for job in employee.wo_applied_jobs.all %}
+                                    <div class="single_jobs shadow-sm mb-3 p-3 rounded">
+                                        <div class="jobs_left">
+                                            <div class="jobs_conetent">
+                                                <a href="{% url 'job_details' job_id=job.job_id %}"><h4>{{ job.title }}</h4></a>
+                                                <div class="links_locat d-flex align-items-center" style="gap: 15px;">
+                                                    <div class="location">
+                                                        <p><i class="fa fa-building"></i> {{ job.employer }}</p>
+                                                    </div>
+                                                    <div class="location">
+                                                        <p><i class="fa fa-money-bill"></i> {{ job.salary }}</p>
+                                                    </div>
+                                                    <div class="location">
+                                                        <p><i class="fa fa-check-circle"></i> Applied</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="jobs_right">
+                                            <div class="apply_now">
+                                                <a href="{% url 'job_details' job_id=job.job_id %}" class="btn btn-sm btn-primary">View Details</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    No jobs applied yet.
+                                </div>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if request.user.employee.type == 'Employee' and request.user.employee.wo_id == employee.wo_id %}
+<div class="modal fade" id="deleteEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="deleteEmployeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteEmployeeModalLabel">Confirm Deletion</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete your employee profile? This action cannot be undone.</p>
+                <p class="text-danger"><strong>Warning:</strong> All your job applications will also be deleted.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <form action="{% url 'delete_employee' employee.wo_id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete Profile</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if request.user.employer.type == 'Employer' %}
+<div class="container mb-5">
+    <a href="{% url 'employee_list' %}" class="btn btn-primary">
+        <i class="fa fa-arrow-left mr-2"></i>Back to Employee List
+    </a>
+</div>
+{% endif %}
+{% endblock %}
