@@ -133,6 +133,5 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'abinraju63@gmail.com'
-EMAIL_HOST_PASSWORD = 'zdfa zbgw quni aumt'
+EMAIL_HOST_PASSWORD = 'use your api key '
 
-DEEPSEEK_API_KEY = "sk-d703cdcb86ce4d75b3237a2aa5ef5e90"
